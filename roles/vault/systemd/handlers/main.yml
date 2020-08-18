@@ -1,0 +1,7 @@
+---
+
+- name: Start vault.service
+  systemd:
+    name: vault
+    state: started
+    enabled: true

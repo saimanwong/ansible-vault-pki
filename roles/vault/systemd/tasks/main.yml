@@ -1,0 +1,9 @@
+---
+
+- name: Ensure vault.service
+  template:
+    src: vault.service.j2
+    dest: /etc/systemd/system/vault.service
+    mode: '0644'
+  notify: Start vault.service
+

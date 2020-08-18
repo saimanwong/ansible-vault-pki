@@ -1,0 +1,9 @@
+---
+# https://learn.hashicorp.com/tutorials/vault/deployment-guide
+
+- hosts: vault
+  roles:
+    - vault/download
+    - vault/install
+    - vault/user
+    - vault/systemd

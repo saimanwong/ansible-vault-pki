@@ -1,0 +1,25 @@
+---
+
+- name: Set fact for Vault download
+  set_fact:
+    base_url: "{{ vault_url }}/{{ vault_version }}/vault_{{ vault_version }}"
+    file: linux_amd64.zip
+
+- name: Get Vault {{ vault_version }} SHA256
+  uri:
+    url: "{{ base_url }}_SHA256SUMS"
+    return_content: true
+  register: output
+
+- name: Set fact for Vault {{ vault_version }} SHA256
+  set_fact:
+    sha256hash: "{{ item.split(' ')[0] }}"
+  when: file in item
+  loop: "{{ output.content.split('\n') }}"
+
+- name: Download Vault {{ vault_version }}
+  get_url:
+    url: "{{ vault_url }}/{{ vault_version }}/vault_{{ vault_version }}_{{ file }}"
+    checksum: "sha256:{{ sha256hash }}"
+    dest: /tmp/vault.zip
+    mode: '0600'

@@ -1,0 +1,34 @@
+---
+
+- name: Ensure unzip
+  yum:
+    name: unzip
+    state: present
+
+- name: Extract /tmp/vault.zip into /usr/local/bin/vault
+  unarchive:
+    src: /tmp/vault.zip
+    dest: /usr/local/bin
+    owner: root
+    group: root
+    remote_src: true
+
+- name: Set cap_ipc_lock+ep on /usr/local/bin/vault
+  capabilities:
+    path: /usr/local/bin/vault
+    capability: cap_ipc_lock+ep
+    state: present
+
+- name: Remove /tmp/vault.zip
+  file:
+    path: /tmp/vault.zip
+    state: absent
+  when: not vault_keep_zip
+
+- name: Get current version on remote
+  command: vault --version
+  register: version
+
+- name: Current vault version (inventory vault_version {{ vault_version }})
+  debug:
+    msg: "{{ version.stdout }}"

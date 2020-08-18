@@ -1,0 +1,8 @@
+---
+
+- name: Add 'vault' user
+  user:
+    name: vault
+    home: /etc/vault.d
+    shell: /bin/false
+    system: true
