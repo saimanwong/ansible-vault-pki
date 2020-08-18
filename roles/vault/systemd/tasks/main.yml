@@ -1,5 +1,14 @@
 ---
 
+- name: Ensure vault.hcl
+  template:
+    src: vault.hcl.j2
+    dest: /etc/vault.d/vault.hcl
+    owner: vault
+    group: vault
+    mode: '0640'
+  notify: Start vault.service
+
 - name: Ensure vault.service
   template:
     src: vault.service.j2
