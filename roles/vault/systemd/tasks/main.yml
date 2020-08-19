@@ -23,3 +23,5 @@
     dest: /etc/systemd/system/vault.service
     mode: '0644'
   notify: Start vault.service
+
+- meta: flush_handlers
