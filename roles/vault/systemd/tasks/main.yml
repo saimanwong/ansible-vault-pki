@@ -9,10 +9,17 @@
     mode: '0640'
   notify: Start vault.service
 
+- name: Set VAULT_ADDR to http instead of https
+  lineinfile:
+    path: /etc/environment
+    regexp: '^VAULT_ADDR='
+    line: 'VAULT_ADDR=http://localhost:8200'
+    create: true
+    state: "{{ 'present' if vault_tls_disable else 'absent' }}"
+
 - name: Ensure vault.service
   template:
     src: vault.service.j2
     dest: /etc/systemd/system/vault.service
     mode: '0644'
   notify: Start vault.service
-
