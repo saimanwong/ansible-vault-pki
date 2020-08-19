@@ -1,0 +1,15 @@
+---
+
+- name: Check if vault is initialized
+  shell: vault status -format json; exit 0
+  register: status
+
+- block:
+  - name: Initialize Vault
+    command: vault operator init
+    register: init_results
+
+  - name: Vault keys and token
+    debug:
+      msg: "{{ init_results.stdout_lines }}"
+  when: not (status.stdout|from_json).initialized

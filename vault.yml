@@ -7,3 +7,4 @@
     - vault/install
     - vault/user
     - vault/systemd
+    - vault/operator/init
