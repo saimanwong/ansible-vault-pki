@@ -1,17 +1,27 @@
 SHELL=/bin/bash
 
 dockerfile = Dockerfile.centos
-image_name = centos7:systemd
+image_name = centos7
 container_prefix = lab
 
 containers = ${container_prefix}-root ${container_prefix}-intermediate ${container_prefix}-issuing
 
 ssh_pub_key = ${HOME}/.ssh/id_rsa.pub
 
-all: build run setup
+all: build setup run
 
 build:
-	docker build -t ${image_name} -f ${dockerfile} .
+	docker build -t ${image_name}:systemd -f ${dockerfile} .
+
+setup:
+	docker run --privileged -d --name temp ${image_name}:systemd
+	docker exec -it temp /bin/bash -c "yum update -y"; \
+	docker exec -it temp /bin/bash -c "yum install -y openssh-server"; \
+	docker exec -it temp /bin/bash -c "systemctl start sshd"; \
+	docker exec -it temp /bin/bash -c "mkdir /root/.ssh"; \
+	docker exec -it temp /bin/bash -c "echo \"$$(cat ${ssh_pub_key})\" > /root/.ssh/authorized_keys"; \
+	docker commit temp ${image_name}:lab
+	docker rm -f temp
 
 run: $(containers)
 $(containers):
@@ -19,16 +29,7 @@ $(containers):
 		-l ${container_prefix}-pki \
 		-p 2222-2224:22 \
 		--name $@ \
-		${image_name}
-
-setup:
-	for i in $$(docker ps -qf "label=${container_prefix}-pki"); do \
-		docker exec -it $${i} /bin/bash -c "yum install -y openssh-server"; \
-		docker exec -it $${i} /bin/bash -c "systemctl start sshd"; \
-		docker exec -it $${i} /bin/bash -c "mkdir /root/.ssh"; \
-		docker exec -it $${i} /bin/bash -c "echo \"$$(cat ${ssh_pub_key})\" > /root/.ssh/authorized_keys"; \
-	done
-
+		${image_name}:lab
 
 ps:
 	docker ps -af "label=${container_prefix}-pki"
