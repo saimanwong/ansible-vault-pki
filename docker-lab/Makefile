@@ -28,6 +28,7 @@ $(containers):
 	docker run -d --privileged \
 		-l ${container_prefix}-pki \
 		-p 2222-2224:22 \
+		-p 8200-8202:22 \
 		--name $@ \
 		${image_name}:lab
 

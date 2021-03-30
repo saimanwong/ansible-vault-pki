@@ -1,7 +1,7 @@
 storage "inmem" {}
 
 listener "tcp" {
-  address     = "127.0.0.1:8200"
+  address     = "0.0.0.0:8200"
 {% if vault_tls_disable %}
   tls_disable = 1
 {% endif %}
